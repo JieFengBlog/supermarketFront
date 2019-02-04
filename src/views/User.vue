@@ -1,10 +1,10 @@
 <template>
-    <div>
+    <div id="user">
     <el-col :span="24" class="toolbar" >
 
-        <el-form :inline="true" style="margin-top:5px;">
+        <el-form :inline="true" style="margin-top:5px;float:right">
             <el-form-item>
-                <el-input placeholder="姓名"></el-input>
+                <el-input placeholder="输入关键字"></el-input>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary">查询</el-button>
@@ -119,5 +119,7 @@
 </script>
 
 <style scoped>
-
+    #user{
+        margin-top: 30px;
+    }
 </style>

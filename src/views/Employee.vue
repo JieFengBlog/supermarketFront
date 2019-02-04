@@ -1,8 +1,8 @@
 <template>
-    <div>
+    <div id="employee">
         <el-col :span="24" class="toolbar" >
 
-            <el-form :inline="true" style="margin-top:5px;">
+            <el-form :inline="true" style="margin-top:5px; float: right;">
                 <el-form-item>
                     <el-input placeholder="姓名"></el-input>
                 </el-form-item>
@@ -87,7 +87,7 @@
                     <el-button
                             size="mini"
                             type="danger"
-                            @click="deleteItem"
+                            @click="deleteItem(scope.$index,scope.row)"
                     >删除</el-button>
                 </template>
             </el-table-column>
@@ -100,7 +100,7 @@
                     @size-change="handleSizeChange"
                     @current-change="handleCurrentChange"
                     :current-page="currentPage"
-                    :page-sizes="[5, 8, 10, 15]"
+                    :page-sizes="[6, 8, 10, 15]"
                     :page-size="currentSize"
                     layout="total, sizes, prev, pager, next, jumper"
                     :total="tableData1.length">
@@ -133,7 +133,7 @@
         data(){
             return {
                 currentPage:1,
-                currentSize:8,
+                currentSize:6,
                 tableData1: [],
                 multipleSelection: [],
                 loading:true,
@@ -158,11 +158,8 @@
             handleCurrentChange(val) {
                 this.currentPage = val;
             },
-            deleteItem(){
-                this.$message({
-                    message: '删除成功',
-                    type: 'success',
-                });
+            deleteItem(index,row){
+                    alert(row.name);
             },
             addEmployee(){
 
@@ -180,5 +177,7 @@
 </script>
 
 <style scoped>
-
+    #employee{
+        margin-top: 30px;
+    }
 </style>

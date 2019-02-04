@@ -21,8 +21,8 @@
             return {
                 logining: false,
                 ruleForm2: {
-                    account: '',
-                    checkPass: ''
+                    account: 'admin',
+                    checkPass: '123456'
                 },
                 rules2: {
                     account: [
@@ -42,32 +42,7 @@
                 this.$refs.ruleForm2.resetFields();
             },
             handleSubmit2(ev) {
-                var _this = this;
-                this.$refs.ruleForm2.validate((valid) => {
-                    if (valid) {
-                        //_this.$router.replace('/table');
-                        this.logining = true;
-                        //NProgress.start();
-                        var loginParams = { username: this.ruleForm2.account, password: this.ruleForm2.checkPass };
-                        requestLogin(loginParams).then(data => {
-                            this.logining = false;
-                            //NProgress.done();
-                            let { msg, code, user } = data;
-                            if (code !== 200) {
-                                this.$message({
-                                    message: msg,
-                                    type: 'error'
-                                });
-                            } else {
-                                sessionStorage.setItem('user', JSON.stringify(user));
-                                this.$router.push({ path: '/table' });
-                            }
-                        });
-                    } else {
-                        console.log('error submit!!');
-                        return false;
-                    }
-                });
+                    this.$router.push('/');
             }
         }
     }

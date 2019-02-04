@@ -4,8 +4,7 @@
       <img src="./assets/logo.png" style="width: 200px; height: 70px;"/>
       <el-row style="padding-top:10px; float:right;">
         <el-col :span="24" >
-          <span>当前登录用户: root   </span>
-          <el-button type="text">退出</el-button>
+          <i class="iconfont sa--tuichu" ></i>
         </el-col>
       </el-row>
 
@@ -73,18 +72,21 @@
 
       <!--Main-->
       <el-main class="main">
-        <el-container>
-          <el-breadcrumb separator="/" style="margin-top:5px;">
-            <el-breadcrumb-item v-for="(item)  in levelList" :key="item.path">
-              <router-link :to="item.path">{{item.name}}</router-link>
-            </el-breadcrumb-item>
-          </el-breadcrumb>
-        </el-container>
 
+          <el-row style="width:100%">
+          <el-col :span="24">
+            <el-card shadow="always">
+              <el-breadcrumb separator="/" style="margin-top:5px;">
+                <el-breadcrumb-item v-for="(item)  in levelList" :key="item.path">
+                  <router-link :to="item.path" >{{item.name}}</router-link>
+                </el-breadcrumb-item>
+              </el-breadcrumb>
+            </el-card>
+          </el-col>
+          </el-row>
 
-        <el-container style="margin-top: 30px;">
           <router-view></router-view>
-        </el-container>
+
       </el-main>
     </el-container>
   </el-container>
@@ -96,7 +98,8 @@
     data() {
       return {
         activeIndex: 'first',
-        levelList:[]
+        levelList:[],
+        count:0
       };
     },
     components:{
@@ -125,6 +128,7 @@
       },
     },
     created() {
+
       this.getBreadcrumb();
     },
 
