@@ -1,7 +1,7 @@
 <template>
     <div id="employee">
         <el-col :span="24" class="toolbar" >
-
+            <el-button type="danger" size="mini" style="margin-top: 10px;" @click="batchDelete" >批量删除</el-button>
             <el-form :inline="true" style="margin-top:5px; float: right;">
                 <el-form-item>
                     <el-input placeholder="姓名"></el-input>
@@ -16,9 +16,13 @@
         </el-col>
 
         <el-table
+                ref="multipleTable"
                 :data="tableData1.slice((currentPage-1)*currentSize,currentPage*currentSize)"
                 style="width: 100%"
+                tooltip-effect="dark"
                 v-loading="loading"
+                highlight-current-row
+                @selection-change="handleSelectionChange"
                 :default-sort = "{prop: 'date', order: 'descending'}"
         >
             <el-table-column
@@ -124,6 +128,7 @@
                 <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
             </div>
         </el-dialog>
+
     </div>
 </template>
 
@@ -135,6 +140,7 @@
                 currentPage:1,
                 currentSize:6,
                 tableData1: [],
+                selectRow:[],
                 multipleSelection: [],
                 loading:true,
                 dialogFormVisible: false,
@@ -161,8 +167,18 @@
             deleteItem(index,row){
                     alert(row.name);
             },
-            addEmployee(){
-
+            handleSelectionChange(val){
+                this.multipleSelection = val;
+                this.selectRow.splice(0,this.selectRow.length);//每次改变都清空保存的选中值，这样不至于每次调用都增加，很容易重复
+                for(let i = 0; i < this.multipleSelection.length; i++){
+                   this.selectRow.push(this.multipleSelection[i].id)
+                }
+                console.log(this.selectRow);
+            },
+            batchDelete(){
+                for(let i = 0; i < this.selectRow.length; i++){
+                    this.tableData1.splice(this.selectRow[i],1);
+                }
             }
         },
         created() {

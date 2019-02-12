@@ -5,7 +5,7 @@
                 <el-row>
                     <el-card shadow="always" style="text-align: center; color:#009999">
                         <span>注册人数</span><br>
-                        <span style="font-weight: bold">350</span>
+                        <span style="font-weight: bold" >350</span>
                     </el-card>
                 </el-row>
 
@@ -37,7 +37,7 @@
             </el-col>
             <el-col :span="12" >
                 <el-card shadow="always" style="text-align: center; color:#009999">
-                <ve-histogram :data="chartData"></ve-histogram>
+                <ve-pie :data="chartData"></ve-pie>
                 </el-card>
             </el-col>
         </el-row>

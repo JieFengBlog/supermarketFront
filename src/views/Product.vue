@@ -2,27 +2,64 @@
     <div id="product">
         <el-col :span="24" class="toolbar" >
 
-            <el-button type="danger" size="mini" style="margin-top: 10px;" @click="open2">批量删除</el-button>
-            <el-form :inline="true" style="margin-top:5px; float:right">
+            <el-form :inline="true" style="margin-top:5px; ">
                 <el-form-item>
-                    <el-input placeholder="输入查询关键字"></el-input>
+                    <el-button type="primary" @click="addProductBtn">新增</el-button>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary">查询</el-button>
+                    <el-button type="primary" @click="searchProduct">查询</el-button>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary">新增</el-button>
+                    <el-input placeholder="输入查询关键字" v-model="searchCondition"></el-input>
+                </el-form-item>
+                <!--批量删除按钮-->
+                <el-form-item style="float:right">
+                    <el-button  v-if="mulFlag" type="danger"  @click="batchDelete">批量删除</el-button>
                 </el-form-item>
             </el-form>
         </el-col>
 
+        <!--当点击添加商品的按钮时弹出的diglog-->
+        <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible">
+            <el-form :model="form" :rules="productRules">
+                <el-form-item label="商品名称" :label-width="formLabelWidth" prop="name">
+                    <el-input v-model="form.name" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="描述" :label-width="formLabelWidth">
+                    <el-input v-model="form.productDesc" autocomplete="off"  type="textarea" :row="2"></el-input>
+                </el-form-item>
+                <el-form-item label="单价" :label-width="formLabelWidth" prop="price">
+                    <el-input v-model="form.price" autocomplete="off" type="number"></el-input>
+                </el-form-item>
+                <el-form-item label="分类" :label-width="formLabelWidth">
+                    <el-select v-model="form.category" placeholder="请选择分类">
+                        <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="库存" :label-width="formLabelWidth" prop="stock">
+                    <el-input v-model="form.stock" autocomplete="off" type="number"></el-input>
+                </el-form-item>
+                <el-form-item label="供应商" :label-width="formLabelWidth">
+                    <el-input v-model="form.provide" autocomplete="off"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogFormVisible = false">取 消</el-button>
+                <el-button type="primary" @click="addOrEditProduct" >确 定</el-button>
+            </div>
+        </el-dialog>
+
+
+        <!--Table-->
         <el-table
                 :data="tableData.slice((currentPage-1)*currentSize,currentPage*currentSize)"
                 style="width: 100%"
                 v-loading="loading"
+                ref="multipleTable"
+                @selection-change="handleSelectionChange"
                 :default-sort = "{prop: 'date', order: 'descending'}"
         >
-
+            <!--Table中的折叠页-->
             <el-table-column type="expand">
                 <template slot-scope="props">
                     <el-form label-position="left" inline class="table-item-expand">
@@ -51,8 +88,7 @@
                 </template>
             </el-table-column>
 
-
-
+            <!--Table中的显示行-->
             <el-table-column
                     type="selection"
                     width="55">
@@ -93,7 +129,8 @@
                     <el-switch
                             v-model="scope.row.status"
                             active-color="#13ce66"
-                            inactive-color="#ff4949">
+                            inactive-color="#ff4949"
+                            @change="productStatus(scope.row)">
                     </el-switch>
                 </template>
             </el-table-column>
@@ -102,6 +139,7 @@
                 <template slot-scope="scope">
                     <el-button
                             size="mini"
+                            @click="EidtProductInfoBtn(scope.row)"
                     >编辑</el-button>
                     <el-button
                             size="mini"
@@ -113,6 +151,7 @@
 
         </el-table>
 
+        <!--分页按钮-->
         <el-container style="padding:25px 25%">
             <el-pagination
                     background
@@ -129,16 +168,47 @@
 </template>
 
 <script>
+
     export default {
         name: "User",
         data(){
             return {
+                dialogTitle:'',
+                addOrEdit:true,// true是添加  false是编辑
+                mulFlag:true,
                 currentPage:1,
                 currentSize:8,
                 tableData: [],
-                multipleSelection: [],
+                mulId:[],
+                mul: [],
+                dialogFormVisible: false,
+                formLabelWidth: '120px',
                 loading:true,
-                putAway:true
+                putAway:true,
+                categoryList:[],
+                searchCondition:'',
+                form: {
+                    id:null,
+                    name: '',
+                    productDesc:'',
+                    price: null,
+                    category: '',
+                    stock: null,
+                    provide: '',
+                    status: '',
+                    createTime: ''
+                },
+                productRules:{
+                        name:[
+                            {required:true,message:'请输入商品名称',trigger:'blur'}
+                        ],
+                        price:[
+                            {required:true,message:'请输入商品价格',trigger:'blur'}
+                        ],
+                        stock:[
+                            {required:true,message:'请输入商品库存',trigger:'blur'}
+                        ]
+                }
             }
         },
         methods:{
@@ -148,35 +218,138 @@
             handleCurrentChange(val) {
                 this.currentPage = val;
             },
-            dateFormater(row,column,cellValue){
-                let unixTimestamp = new Date( row.createTime ) ;
-                return unixTimestamp.toLocaleString();
+            handleSelectionChange(val){
+                this.mul = val;
             },
+            //Switch滑块改变的回调函数
+            productStatus(data){
+                this.$axios({
+                    method:'post',
+                    url:'/api/back/product/changestatus',
+                    data:{
+                        id:data.id,
+                        status:data.status
+                    }
+                })
+            },
+            //将批量选中的数据的i读取出来
+            handlerBatchData(){
+                this.mulId.splice(0,this.mulId.length);
+                for(let i = 0; i < this.mul.length; i++){
+                    this.mulId.push(this.mul[i].id)
+                }
+            },
+
+
+            //点击添加商品按钮
+            addProductBtn(){
+                //清空
+                this.form.id = null;
+                this.form.name = '';
+                this.form.productDesc = '';
+                this.form.price = null;
+                this.form.category = '';
+                this.form.stock = null;
+                this.form.status = '';
+                this.form.provide = '';
+                //如果是添加商品的话
+                this.dialogTitle = "添加商品"
+                this.dialogFormVisible = true;
+                this.getCategories();
+
+                //dialog的作用是添加商品
+                this.addOrEdit = true;
+            },
+
+
+
+            //确定添加商品
+            addOrEditProduct(){
+                console.log(this.form)
+                this.dialogFormVisible = false;
+                this.$axios({
+                    method:'post',
+                    url:'/api/back/product/addoreditproduct',
+                    data:{
+                        product:this.form,
+                        addOrEdit:this.addOrEdit
+                    }
+                }).then((response)=>{
+                    if(response.data.success){
+                        this.getAllProductFromServer();
+                        this.$message({
+                            type: 'success',
+                            message: '操作成功'
+                        });
+                    }else{
+                        this.$message({
+                            type: 'error',
+                            message: '操作失败'
+                        });
+                    }
+                })
+            },
+
+
+            //编辑商品信息
+            EidtProductInfoBtn(data){
+                this.dialogTitle = "编辑商品信息";
+                //dialog是编辑商品信息
+                this.addOrEdit = false;
+                //填充信息
+                this.form.id = data.id;
+                this.form.name = data.name;
+                this.form.productDesc = data.productDesc;
+                this.form.price = data.price;
+                this.form.category = data.category.id;
+                this.form.stock = data.stock;
+                this.form.status = data.status;
+                this.form.provide = data.provide;
+                this.getCategories();
+                //显示dialog控件
+                this.dialogFormVisible = true;
+
+            },
+
+            //获取分类列表
+            getCategories(){
+                this.$axios({
+                    method: 'get',
+                    url: '/api/back/category/getallcategory'
+                }).then((response) => {
+                    if (response.data.success) {
+                        this.categoryList = response.data.categoryList;
+                    } else {
+                        this.$message({
+                            type: 'success',
+                            message: response.data.errMsg
+                        });
+                    }
+                })
+            },
+
+
+            //删除单个商品时执行的
             deleteProductItem(index,row){
                 this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-
-                    //先删除数据库中的商品再删除前端填充的数据
+                    //根据ID删除商品，然后重新请求服务器填充
                     this.$axios({
                         method:'POST',
                         url:'/api/back/product/deleteproductbyid',
-                        headers:{
-                            'Content-Type': 'application/json;charset=utf-8',
-                        },
-                        params:{
-                            'id':row.id
+                        data:{
+                            id:row.id
                         }
                     }).then((response)=>{
+                        this.getAllProductFromServer();
                         this.$message({
                             type: 'success',
-                            message: '删除成功!' + response.data.success
+                            message: '删除成功!'
                         });
                     })
-                    //删除前端列表的数据
-                    this.tableData.splice(index,1);
                 }).catch(() => {
                     this.$message({
                         type: 'info',
@@ -184,37 +357,88 @@
                     });
                 });
             },
-            open2() {
+
+
+            //从服务器上获取所有的商品信息
+            getAllProductFromServer(){
+                this.$axios. get("/api/back/product/getallproduct")
+                    .then(response=>{
+                        this.loading = true;
+                        this.tableData = response.data.products;
+                        this.loading = false;
+                    })
+            },
+
+            //模糊查询
+            searchProduct(){
+                console.log(this.searchCondition)
+                this.$axios({
+                    method:'post',
+                    url:'/api/back/product/selectcondition',
+                    data:{
+                        searchCondition:this.searchCondition
+                    }
+                }).then((response)=>{
+                    if(response.data.success){
+                        this.tableData = response.data.list
+                    }else{
+                        this.$message({
+                            type: 'error',
+                            message: '查询失败!'
+                        });
+                    }
+                })
+            },
+
+
+            //批量删除按钮
+            batchDelete() {
+                if(this.mul.length == 0){
+                    this.$message({
+                        type: 'error',
+                        message: '选择不能为空'
+                    });
+                    return;
+                }
                 this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    this.$message({
-                        type: 'success',
-                        message: '删除成功!'
-                    });
+                   this.handlerBatchData();
+                    this.$axios({
+                        method:'POST',
+                        url:'/api/back/product/batchdeleteproduct',
+                        data:{
+                            batchID:JSON.stringify(this.mulId)
+                        }
+                    }).then((response)=>{
+                        this.getAllProductFromServer();
+                        this.$message({
+                            type: 'success',
+                            message: '删除成功!'
+                        });
+                    })
+
                 }).catch(() => {
                     this.$message({
                         type: 'info',
                         message: '已取消删除'
                     });
                 });
-            }
+            },
         },
         created() {
-            //     /api/back/product/getallproduct
-            this.$axios. get("/api/back/product/getallproduct")
-                .then(response=>{
-                    console.log(response.data)
-                    this.tableData = response.data.products;
-                    this.loading = !this.loading;
-                })
+            this.getAllProductFromServer();
+        },
+        watch:{
+            searchCondition(){
+                if(this.searchCondition == null || this.searchCondition == ''){
+                    this.getAllProductFromServer();
+                }
+            }
         }
     }
-    Date.prototype.toLocaleString = function() {
-        return this.getFullYear() + "/" + (this.getMonth() + 1) + "/" + this.getDate() + "/ " + this.getHours() + ":" + this.getMinutes() + ":" + this.getSeconds();
-    };
 </script>
 
 <style>

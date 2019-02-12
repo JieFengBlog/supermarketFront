@@ -5,12 +5,16 @@ import ElementUI from 'element-ui'
 import locale from 'element-ui/lib/locale/lang/en'
 import './styles.scss'
 import './assets/iconfont.css'
-import Axios from 'axios'
+import axios from 'axios'
 import VCharts from 'v-charts'
+import qs from 'qs'
 
 Vue.use(ElementUI, { locale })
 Vue.use(VCharts)
-Vue.prototype.$axios = Axios
+
+axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+Vue.prototype.$axios = axios
+Vue.use(qs)
 
 Vue.config.productionTip = false
 
