@@ -4,7 +4,7 @@
       <img src="./assets/logo.png" style="width: 200px; height: 70px;"/>
       <el-row style="padding-top:10px; float:right;">
         <el-col :span="24" >
-          <i class="iconfont sa--tuichu" ></i>
+          <el-button type="text" style="background: #545c64;"><i class="iconfont sa--tuichu" @click="logout"></i></el-button>
         </el-col>
       </el-row>
 
@@ -22,19 +22,24 @@
                  unique-opened
                  active-text-color="#19be6b"
         >
-          <el-menu-item index="/home">
-            <i class="el-icon-menu"></i>
+          <el-menu-item index="/home" >
+            <i class="iconfont sa--shouye ali"></i>
             <span slot="title">首页</span>
           </el-menu-item>
 
           <el-submenu index="/home/stock">
             <template slot="title">
-              <i class="el-icon-location"></i>
+              <i class="el-icon-circle-plus-outline"></i>
               <span slot="title">进货管理</span>
             </template>
             <el-menu-item index="/home/stock/in">进货入库</el-menu-item>
             <el-menu-item index="/home/stock/order">订单查询</el-menu-item>
           </el-submenu>
+
+          <el-menu-item index="/home/category">
+            <i class="el-icon-menu"></i>
+            <span slot="title">分类管理</span>
+          </el-menu-item>
 
           <el-menu-item index="/home/product">
             <i class="el-icon-document"></i>
@@ -42,17 +47,17 @@
           </el-menu-item>
 
           <el-menu-item index="/home/user">
-            <i class="el-icon-document"></i>
+            <i class="el-icon-setting"></i>
             <span slot="title">用户管理</span>
           </el-menu-item>
 
           <el-menu-item index="/home/employee">
-            <i class="el-icon-document"></i>
+            <i class="el-icon-time"></i>
             <span slot="title">员工管理</span>
           </el-menu-item>
 
           <el-menu-item index="/home/chart">
-            <i class="el-icon-setting"></i>
+            <i class="el-icon-news"></i>
             <span slot="title">报表统计</span>
           </el-menu-item>
 
@@ -94,6 +99,8 @@
 
 <script>
   import User from './views/User'
+  import {conversion} from './commons/BooleanUtil'
+
   export default {
     data() {
       return {
@@ -126,9 +133,16 @@
         for(let i ; i < matched.length; i++)
           console.log(matched[i].path)
       },
+      logout(){
+        sessionStorage.setItem("loginStatus","false");
+        this.$router.push('/login')
+      }
     },
     created() {
-
+      console.log("home: conversion loginStatus: " + conversion(sessionStorage.getItem("loginStatus")))
+      if(!conversion(sessionStorage.getItem("loginStatus"))){
+        this.$router.push('/login')
+      }
       this.getBreadcrumb();
     },
 
@@ -158,6 +172,11 @@
   .main{
     width:100%;
     padding:15px 25px;
+  }
+
+  .ali{
+    margin-left: 5px;
+    margin-right: 8px;
   }
 </style>
 

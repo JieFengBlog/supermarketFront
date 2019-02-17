@@ -5,7 +5,7 @@
                 <el-row>
                     <el-card shadow="always" style="text-align: center; color:#009999">
                         <span>注册人数</span><br>
-                        <span style="font-weight: bold" >350</span>
+                        <countTo :startVal='personStart' :endVal='personEnd' :duration='3000' class="count"></countTo>
                     </el-card>
                 </el-row>
 
@@ -14,13 +14,13 @@
             <el-col :span="6"><div class="grid-content bg-purple-light">
                 <el-card shadow="always" style="color:#CC9933; text-align: center; ">
                     <span>商品种类</span><br>
-                    <span style="font-weight: bold">120</span>
+                    <countTo :startVal='productStart' :endVal='productEnd' :duration='3000' class="count"></countTo>
                 </el-card>
             </div></el-col>
             <el-col :span="6"><div class="grid-content bg-purple">
                 <el-card shadow="always" style="color:#9999FF; text-align: center; ">
                     <span>员工人数</span><br>
-                    <span style="font-weight: bold">350</span>
+                    <countTo :startVal='employeeStart' :endVal='employeeEnd' :duration='3000' class="count"></countTo>
                 </el-card>
             </div></el-col>
         </el-row>
@@ -29,7 +29,7 @@
             <el-col :span="12" style="font-weight: bold; text-align: center;color: teal;">注册人数走势</el-col>
             <el-col :span="12" style="font-weight: bold; text-align: center;color: teal;">商品销售走势</el-col>
         </el-row>
-        <el-row gutter="12">
+        <el-row :gutter="12">
             <el-col :span="12">
                 <el-card shadow="always" style="text-align: center; color:#009999">
                 <ve-line :data="chartData" :settings="chartSettings"></ve-line>
@@ -45,7 +45,11 @@
 </template>
 
 <script>
+    import countTo from 'vue-count-to';
     export default {
+        components:{
+          countTo
+        },
         name:'first',
         data () {
             this.chartSettings = {
@@ -53,6 +57,12 @@
                 dimension: ['日期']
             }
             return {
+                personStart:0,
+                personEnd:345,
+                productStart:600,
+                productEnd:1200,
+                employeeStart:0,
+                employeeEnd:756,
                 chartData: {
                     columns: ['日期', '访问用户', '下单用户'],
                     rows: [
@@ -70,5 +80,8 @@
 </script>
 
 <style scoped>
-
+    .count{
+        font-weight: bold;
+        font-size: 19px;
+    }
 </style>
