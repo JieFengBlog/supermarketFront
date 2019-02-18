@@ -31,11 +31,15 @@
                 <el-form-item label="单价" :label-width="formLabelWidth" prop="price">
                     <el-input v-model="form.price" autocomplete="off" type="number"></el-input>
                 </el-form-item>
+                <el-form-item label="单位" :label-width="formLabelWidth" prop="price">
+                    <el-input v-model="form.unit" autocomplete="off" type="number"></el-input>
+                </el-form-item>
                 <el-form-item label="分类" :label-width="formLabelWidth">
                     <el-select v-model="form.category" placeholder="请选择分类">
                         <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id"></el-option>
                     </el-select>
                 </el-form-item>
+
                 <el-form-item label="库存" :label-width="formLabelWidth" prop="stock">
                     <el-input v-model="form.stock" autocomplete="off" type="number"></el-input>
                 </el-form-item>
@@ -72,6 +76,9 @@
                         <el-form-item label="单价">
                             <span>{{ props.row.price }}</span>
                         </el-form-item>
+                        <el-form-item label="单位">
+                            <span>{{ props.row.unit }}</span>
+                        </el-form-item>
                         <el-form-item label="库存">
                             <span>{{ props.row.stock }}</span>
                         </el-form-item>
@@ -103,6 +110,12 @@
                     prop="price"
                     width="100"
                     label="单价">
+            </el-table-column>
+
+            <el-table-column
+                    prop="unit"
+                    width="150"
+                    label="单位">
             </el-table-column>
             <!--category.name-->
             <el-table-column
@@ -191,6 +204,7 @@
                     id:null,
                     name: '',
                     productDesc:'',
+                    unit:'',
                     price: null,
                     category: '',
                     stock: null,

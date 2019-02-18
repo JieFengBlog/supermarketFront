@@ -2,16 +2,22 @@
   <el-container class="container">
     <el-header class="header" height="70px">
       <img src="./assets/logo.png" style="width: 200px; height: 70px;"/>
-      <el-row style="padding-top:10px; float:right;">
+      <el-row style="padding-top:12px; float:right; padding-right: 30px;">
         <el-col :span="24" >
-          <el-button type="text" style="background: #545c64;"><i class="iconfont sa--tuichu" @click="logout"></i></el-button>
+            <el-dropdown>
+                  <img src="./assets/touxiang.jpg" style="width: 45px; height: 45px;border-radius: 50%;"/>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item>退出登录</el-dropdown-item>
+                <el-dropdown-item>清空缓存</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
         </el-col>
       </el-row>
 
     </el-header>
     <el-container>
       <el-aside width="230px">
-        <el-menu :default-active="this.$router.path"
+        <el-menu :default-active="activeMenuIndex"
                  router
                  class="el-menu-vertical-demo"
                  @open="handleOpen"
@@ -27,19 +33,18 @@
             <span slot="title">首页</span>
           </el-menu-item>
 
-          <el-submenu index="/home/stock">
-            <template slot="title">
-              <i class="el-icon-circle-plus-outline"></i>
-              <span slot="title">进货管理</span>
-            </template>
-            <el-menu-item index="/home/stock/in">进货入库</el-menu-item>
-            <el-menu-item index="/home/stock/order">订单查询</el-menu-item>
-          </el-submenu>
-
-          <el-menu-item index="/home/category">
-            <i class="el-icon-menu"></i>
-            <span slot="title">分类管理</span>
-          </el-menu-item>
+            <el-menu-item index="/home/in">
+              <i class="el-icon-d-arrow-right"></i>
+              <span slot="title">入库</span>
+            </el-menu-item>
+            <el-menu-item index="/home/out">
+              <i class="el-icon-d-arrow-left"></i>
+              <span slot="title">出库</span>
+            </el-menu-item>
+            <el-menu-item index="/home/order">
+              <i class="el-icon-search"></i>
+              <span slot="title">订单查询</span>
+            </el-menu-item>
 
           <el-menu-item index="/home/product">
             <i class="el-icon-document"></i>
@@ -145,6 +150,11 @@
       }
       this.getBreadcrumb();
     },
+    computed:{
+      activeMenuIndex(){
+        return this.$route.path
+      }
+    }
 
   }
 </script>

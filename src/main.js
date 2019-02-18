@@ -9,9 +9,11 @@ import axios from 'axios'
 import VCharts from 'v-charts'
 import qs from 'qs'
 import {store} from "./store/store";
+import Cookies from 'js-cookie'
 
 Vue.use(ElementUI, { locale })
 Vue.use(VCharts)
+Vue.use(Cookies)
 
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 Vue.prototype.$axios = axios

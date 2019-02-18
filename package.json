@@ -10,6 +10,7 @@
     "axios": "^0.18.0",
     "echarts": "^4.2.0-rc.2",
     "element-ui": "^2.3.6",
+    "js-cookie": "^2.2.0",
     "node-sass": "^4.11.0",
     "qs": "^6.6.0",
     "sass-loader": "^7.1.0",

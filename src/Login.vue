@@ -44,7 +44,7 @@
                 this.logining = true;
                 this.$axios({
                     method:'post',
-                    url:'/api/back/user/validation',
+                    url:'/api/back/login/validation',
                     data:{
                         userInfo:this.credentials
                     }
