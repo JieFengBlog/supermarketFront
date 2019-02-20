@@ -4,11 +4,11 @@
       <img src="./assets/logo.png" style="width: 200px; height: 70px;"/>
       <el-row style="padding-top:12px; float:right; padding-right: 30px;">
         <el-col :span="24" >
-            <el-dropdown>
+            <el-dropdown @command="handleCommand">
                   <img src="./assets/touxiang.jpg" style="width: 45px; height: 45px;border-radius: 50%;"/>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item>退出登录</el-dropdown-item>
-                <el-dropdown-item>清空缓存</el-dropdown-item>
+                <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+                <el-dropdown-item command="clear">清空缓存</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
         </el-col>
@@ -43,7 +43,7 @@
             </el-menu-item>
             <el-menu-item index="/home/order">
               <i class="el-icon-search"></i>
-              <span slot="title">订单查询</span>
+              <span slot="title">订单管理</span>
             </el-menu-item>
 
           <el-menu-item index="/home/product">
@@ -66,16 +66,11 @@
             <span slot="title">报表统计</span>
           </el-menu-item>
 
-          <el-submenu index="7">
-            <template slot="title">
-              <i class="el-icon-location"></i>
-              <span slot="title">回收站</span>
-            </template>
-            <el-menu-item index="7-1">单据恢复</el-menu-item>
-            <el-menu-item index="7-3">员工恢复</el-menu-item>
-            <el-menu-item index="7-4">用户恢复</el-menu-item>
-            <el-menu-item index="7-5">清空所有</el-menu-item>
-          </el-submenu>
+          <el-menu-item index="/home/restore">
+            <i class="el-icon-refresh"></i>
+            <span slot="title">订单恢复</span>
+          </el-menu-item>
+
         </el-menu>
       </el-aside>
 
@@ -105,6 +100,7 @@
 <script>
   import User from './views/User'
   import {conversion} from './commons/BooleanUtil'
+  import {clear} from "./commons/cache";
 
   export default {
     data() {
@@ -138,9 +134,30 @@
         for(let i ; i < matched.length; i++)
           console.log(matched[i].path)
       },
+      //清除缓存
+      clearLocalStorage(){
+        clear();
+        this.$notify({
+          title: '成功',
+          offset: 100,
+          duration: 1000,
+          message: '本地缓存已经清除',
+          type: 'success'
+        });
+      },
+      //登出
       logout(){
         sessionStorage.setItem("loginStatus","false");
         this.$router.push('/login')
+      },
+      //处理下拉菜单
+      handleCommand(command){
+          switch (command) {
+            case "logout": this.logout();
+                  break;
+            case "clear": this.clearLocalStorage();
+                  break;
+          }
       }
     },
     created() {

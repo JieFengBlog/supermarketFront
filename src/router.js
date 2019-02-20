@@ -10,6 +10,7 @@ import Product from "./views/Product";
 import Employee from "./views/Employee";
 import Chart from "./views/Chart";
 import OutStock from "./views/OutStock";
+import OrderRestore from "./views/OrderRestore";
 
 Vue.use(Router)
 
@@ -42,7 +43,8 @@ export default new Router({
         {path:'/home/user',name:'用户管理',component:User},
         {path:'/home/product',name:'商品管理', component:Product},
         {path:'/home/employee',name:'员工管理',component:Employee},
-        {path:'/home/chart',name:'报表统计',component:Chart}
+        {path:'/home/chart',name:'报表统计',component:Chart},
+        {path:'/home/restore',name:'订单恢复',component:OrderRestore},
       ]
     },
 

@@ -31,15 +31,14 @@
                 <el-form-item label="单价" :label-width="formLabelWidth" prop="price">
                     <el-input v-model="form.price" autocomplete="off" type="number"></el-input>
                 </el-form-item>
-                <el-form-item label="单位" :label-width="formLabelWidth" prop="price">
-                    <el-input v-model="form.unit" autocomplete="off" type="number"></el-input>
+                <el-form-item label="单位" :label-width="formLabelWidth" prop="unit">
+                    <el-input v-model="form.unit" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="分类" :label-width="formLabelWidth">
                     <el-select v-model="form.category" placeholder="请选择分类">
                         <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id"></el-option>
                     </el-select>
                 </el-form-item>
-
                 <el-form-item label="库存" :label-width="formLabelWidth" prop="stock">
                     <el-input v-model="form.stock" autocomplete="off" type="number"></el-input>
                 </el-form-item>
@@ -53,130 +52,146 @@
             </div>
         </el-dialog>
 
+        <el-col :span="24">
+            <!--选择已有的商品进货-->
+            <el-card class="box-card" >
+                <div slot="header" class="clearfix">
+                    <span style="font-size: 20px;">订单列表</span>
+                    <i class="el-icon-tickets" style="float: right; padding: 3px 0"></i>
+                </div>
+                <!--Table-->
+                <el-table
+                        :data="tableData.slice((currentPage-1)*currentSize,currentPage*currentSize)"
+                        style="width: 100%"
+                        border
+                        v-loading="loading"
+                        ref="multipleTable"
+                        @selection-change="handleSelectionChange"
+                        :default-sort = "{prop: 'date', order: 'descending'}"
+                >
+                    <!--Table中的折叠页-->
+                    <el-table-column type="expand">
+                        <template slot-scope="props">
+                            <el-form label-position="left" inline class="table-item-expand">
+                                <el-form-item label="商品名称">
+                                    <span>{{ props.row.name }}</span>
+                                </el-form-item>
+                                <el-form-item label="商品描述">
+                                    <span>{{ props.row.productDesc }}</span>
+                                </el-form-item>
+                                <el-form-item label="单价">
+                                    <span>{{ props.row.price }}</span>
+                                </el-form-item>
+                                <el-form-item label="单位">
+                                    <span>{{ props.row.unit }}</span>
+                                </el-form-item>
+                                <el-form-item label="库存">
+                                    <span>{{ props.row.stock }}</span>
+                                </el-form-item>
+                                <el-form-item label="商品分类">
+                                    <span>{{ props.row.category.name }}</span>
+                                </el-form-item>
+                                <el-form-item label="供货商">
+                                    <span>{{ props.row.provide }}</span>
+                                </el-form-item>
+                                <el-form-item label="创建时间">
+                                    <span>{{ props.row.createTime }}</span>
+                                </el-form-item>
+                            </el-form>
+                        </template>
+                    </el-table-column>
 
-        <!--Table-->
-        <el-table
-                :data="tableData.slice((currentPage-1)*currentSize,currentPage*currentSize)"
-                style="width: 100%"
-                v-loading="loading"
-                ref="multipleTable"
-                @selection-change="handleSelectionChange"
-                :default-sort = "{prop: 'date', order: 'descending'}"
-        >
-            <!--Table中的折叠页-->
-            <el-table-column type="expand">
-                <template slot-scope="props">
-                    <el-form label-position="left" inline class="table-item-expand">
-                        <el-form-item label="商品名称">
-                            <span>{{ props.row.name }}</span>
-                        </el-form-item>
-                        <el-form-item label="商品描述">
-                            <span>{{ props.row.productDesc }}</span>
-                        </el-form-item>
-                        <el-form-item label="单价">
-                            <span>{{ props.row.price }}</span>
-                        </el-form-item>
-                        <el-form-item label="单位">
-                            <span>{{ props.row.unit }}</span>
-                        </el-form-item>
-                        <el-form-item label="库存">
-                            <span>{{ props.row.stock }}</span>
-                        </el-form-item>
-                        <el-form-item label="商品分类">
-                            <span>{{ props.row.category.name }}</span>
-                        </el-form-item>
-                        <el-form-item label="供货商">
-                            <span>{{ props.row.provide }}</span>
-                        </el-form-item>
-                        <el-form-item label="创建时间">
-                            <span>{{ props.row.createTime }}</span>
-                        </el-form-item>
-                    </el-form>
-                </template>
-            </el-table-column>
+                    <!--Table中的显示行-->
+                    <el-table-column
+                            type="selection"
+                            width="55">
+                    </el-table-column>
+                    <el-table-column
+                            align="center"
+                            prop="name"
+                            label="商品名称"
+                            sortable
+                            width="150">
+                    </el-table-column>
+                    <el-table-column
+                            align="center"
+                            prop="price"
+                            width="100"
+                            label="单价">
+                    </el-table-column>
 
-            <!--Table中的显示行-->
-            <el-table-column
-                    type="selection"
-                    width="55">
-            </el-table-column>
-            <el-table-column
-                    prop="name"
-                    label="商品名称"
-                    sortable
-                    width="150">
-            </el-table-column>
-            <el-table-column
-                    prop="price"
-                    width="100"
-                    label="单价">
-            </el-table-column>
+                    <el-table-column
+                            align="center"
+                            prop="unit"
+                            width="150"
+                            label="单位">
+                    </el-table-column>
+                    <!--category.name-->
+                    <el-table-column
+                            align="center"
+                            prop="category.name"
+                            width="150"
+                            label="分类">
+                    </el-table-column>
+                    <el-table-column
+                            align="center"
+                            prop="stock"
+                            width="150"
+                            label="库存">
+                    </el-table-column>
+                    <!--createTime-->
+                    <el-table-column
+                            align="center"
+                            prop="createTime"
+                            width="250"
+                            sortable
+                            label="创建时间"
+                    >
+                    </el-table-column>
 
-            <el-table-column
-                    prop="unit"
-                    width="150"
-                    label="单位">
-            </el-table-column>
-            <!--category.name-->
-            <el-table-column
-                    prop="category.name"
-                    width="150"
-                    label="分类">
-            </el-table-column>
-            <el-table-column
-                    prop="stock"
-                    width="100"
-                    label="库存">
-            </el-table-column>
-            <!--createTime-->
-            <el-table-column
-                    prop="createTime"
-                    width="250"
-                    sortable
-                    label="创建时间"
-            >
-            </el-table-column>
+                    <el-table-column label="上架状态" width="150" align="center">
+                        <template slot-scope="scope">
+                            <el-switch
+                                    v-model="scope.row.status"
+                                    active-color="#13ce66"
+                                    inactive-color="#ff4949"
+                                    @change="productStatus(scope.row)">
+                            </el-switch>
+                        </template>
+                    </el-table-column>
 
-            <el-table-column label="上架状态" width="150">
-                <template slot-scope="scope">
-                    <el-switch
-                            v-model="scope.row.status"
-                            active-color="#13ce66"
-                            inactive-color="#ff4949"
-                            @change="productStatus(scope.row)">
-                    </el-switch>
-                </template>
-            </el-table-column>
+                    <el-table-column label="操作" align="center">
+                        <template slot-scope="scope">
+                            <el-button
+                                    size="mini"
+                                    @click="EidtProductInfoBtn(scope.row)"
+                            >编辑</el-button>
+                            <el-button
+                                    size="mini"
+                                    type="danger"
+                                    @click="deleteProductItem(scope.$index,scope.row)"
+                            >删除</el-button>
+                        </template>
+                    </el-table-column>
 
-            <el-table-column label="操作">
-                <template slot-scope="scope">
-                    <el-button
-                            size="mini"
-                            @click="EidtProductInfoBtn(scope.row)"
-                    >编辑</el-button>
-                    <el-button
-                            size="mini"
-                            type="danger"
-                            @click="deleteProductItem(scope.$index,scope.row)"
-                    >删除</el-button>
-                </template>
-            </el-table-column>
+                </el-table>
 
-        </el-table>
+                <!--分页按钮-->
+                <el-container style="padding:25px 25%">
+                    <el-pagination
+                            background
+                            @size-change="handleSizeChange"
+                            @current-change="handleCurrentChange"
+                            :current-page="currentPage"
+                            :page-sizes="[5, 8, 10, 15]"
+                            :page-size="currentSize"
+                            layout="total, sizes, prev, pager, next, jumper"
+                            :total="tableData.length">
+                    </el-pagination>
+                </el-container>
 
-        <!--分页按钮-->
-        <el-container style="padding:25px 25%">
-            <el-pagination
-                    background
-                    @size-change="handleSizeChange"
-                    @current-change="handleCurrentChange"
-                    :current-page="currentPage"
-                    :page-sizes="[5, 8, 10, 15]"
-                    :page-size="currentSize"
-                    layout="total, sizes, prev, pager, next, jumper"
-                    :total="tableData.length">
-            </el-pagination>
-        </el-container>
+            </el-card>
+        </el-col>
     </div>
 </template>
 
@@ -221,6 +236,9 @@
                         ],
                         stock:[
                             {required:true,message:'请输入商品库存',trigger:'blur'}
+                        ],
+                        unit:[
+                            {required:true,message:'请输入单位',trigger:'blur'}
                         ]
                 }
             }
@@ -279,7 +297,6 @@
 
             //确定添加商品
             addOrEditProduct(){
-                console.log(this.form)
                 this.dialogFormVisible = false;
                 this.$axios({
                     method:'post',
@@ -375,12 +392,13 @@
 
             //从服务器上获取所有的商品信息
             getAllProductFromServer(){
+                this.loading = true;
                 this.$axios. get("/api/back/product/getallproduct")
                     .then(response=>{
-                        this.loading = true;
                         this.tableData = response.data.products;
                         this.loading = false;
                     })
+
             },
 
             //模糊查询

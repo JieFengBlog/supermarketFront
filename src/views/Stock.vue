@@ -1,27 +1,30 @@
 <template>
     <div class="stock">
         <el-row :gutter="20" class="main">
-            <el-col :span="10"><div class="grid-content bg-purple">
-                <!--选择已有的商品进货-->
-                <el-card class="box-card" >
-                    <div slot="header" class="clearfix">
-                        <span style="font-size: 20px;">选择已有的商品添加库存</span>
-                        <i class="el-icon-plus" style="float: right; padding: 3px 0"></i>
-                    </div>
-                    <!--穿梭框-->
-                    <el-transfer v-model="otherTransferDataRight"
-                                 :data="transferDataLift"
-                                 :props="{
-                                      key: 'id',
-                                      label: 'name'
-                                    }"
-                                 filterable
-                                 filter-placeholder="请输入商品名称"
-                                 style=" padding-bottom: 40px;">
+            <el-col :span="10">
+                <div class="grid-content bg-purple">
+                    <!--选择已有的商品进货-->
+                    <el-card class="box-card" >
+                        <div slot="header" class="clearfix">
+                            <span style="font-size: 20px;">选择已有的商品添加库存</span>
+                            <i class="el-icon-plus" style="float: right; padding: 3px 0"></i>
+                        </div>
+                        <!--穿梭框-->
+                        <el-transfer v-model="otherTransferDataRight"
+                                     :data="transferDataLift"
+                                     :props="{
+                                          key: 'id',
+                                          label: 'name'
+                                        }"
+                                     filterable
+                                     filter-placeholder="请输入商品名称"
+                                     style=" padding-bottom: 40px; padding-left: 5%;">
 
-                    </el-transfer>
-                    <el-button type="primary" plain style="margin-left: 60%;" @click="addSubmitList">加入待提交清单</el-button>
-                </el-card>
+                        </el-transfer>
+                        <div style="width: 100%; ">
+                            <el-button size="medium" style="margin-left: 70%;" @click="addSubmitList">加入待提交订单</el-button>
+                        </div>
+                    </el-card>
 
                 <!--添加新的商品库存-->
                 <el-card class="box-card" style="margin-top: 20px;">
@@ -39,6 +42,9 @@
                         </el-form-item>
                         <el-form-item label="单价" :label-width="formLabelWidth" prop="price">
                             <el-input-number v-model="form.price" :min="1" :max="9999" label="描述文字"></el-input-number>
+                        </el-form-item>
+                        <el-form-item label="单位" :label-width="formLabelWidth" prop="unit">
+                            <el-input v-model="form.unit" autocomplete="off"></el-input>
                         </el-form-item>
                         <el-form-item label="分类" :label-width="formLabelWidth">
                             <el-select v-model="form.category" placeholder="请选择分类">
@@ -81,7 +87,7 @@
 
                 <div>
                     <el-form  status-icon  label-width="80px" class="demo-ruleForm">
-                        <el-form-item label="供货商" prop="pass">
+                        <el-form-item label="供货商" prop="supply">
                             <el-input style="width: 50%;" v-model="supply"></el-input>
                         </el-form-item>
                     </el-form>
@@ -94,12 +100,11 @@
                         v-loading="loading"
                         empty-text="暂时没有提交的商品"
                         border
-                        ref="multipleTable"
-                        sum-text="合计"
                         show-summary
+                        sum-text="合计"
+                        ref="multipleTable"
                         :default-sort = "{prop: 'date', order: 'descending'}"
                 >
-
                     <el-table-column
                             prop="name"
                             label="商品名称"
@@ -113,17 +118,14 @@
                             prop="number"
                             width="150">
                         <template slot-scope="scope">
-                            <el-input v-model="scope.row.number" @change="saveListChage" type="number"></el-input>
+                            <el-input v-model="scope.row.number" @change="saveListChage(scope.row)" type="number"></el-input>
                         </template>
                     </el-table-column>
                     <el-table-column
                             align="center"
-                            label="金额( ￥ )"
                             prop="money"
+                            label="金额( ￥ )"
                             width="150">
-                        <template slot-scope="scope">
-                            <el-input v-model="scope.row.money"  @change="saveListChage" type="number"></el-input>
-                        </template>
                     </el-table-column>
                     <el-table-column
                             align="center"
@@ -168,6 +170,7 @@
 
 <script>
     import {transferUtil} from "../commons/TranserUtil";
+    import {clear} from "../commons/cache";
 
     export default {
         name: "InStock",
@@ -180,24 +183,28 @@
                 formLabelWidth:"120px",
                 loading:false,
                 currentPage:1,
-                currentSize:8,
+                currentSize:5,
                 form: {
                     id:null,
                     name: '',
                     productDesc:'',
-                    price: null,
+                    price: 0,
+                    unit:'',
                     category: '',
                     stock: 1,
                     provide: '',
                     status: '',
                     createTime: '',
-                    number: 1,
-                    money:1,
+                    number: 0,
+                    money:0,
                 },
                 categoryList:[]
             }
         },
         methods:{
+            sumMoney(row){
+                return row.number * row.price;
+            },
             showTableData(){
               this.tableData = [];
               localStorage.removeItem("tempTableData");
@@ -208,6 +215,20 @@
             },
             //提交订单
             submitData(){
+                if(this.supply == null || this.supply == ""){
+                    this.$message({
+                        type: 'error',
+                        message: '供应商不能为空'
+                    });
+                    return
+                }
+                if(this.tableData.length == 0){
+                    this.$message({
+                        type: 'error',
+                        message: '商品列表不能为空'
+                    });
+                    return
+                }
                 this.$axios({
                     method: 'post',
                     url: '/api/back/order/purchase',
@@ -218,7 +239,8 @@
                     }
                 }).then((response) => {
                     if(response.data.success){
-                        this.clearLocalStorage();
+                        clear();
+                        this.tableData = [];
                         this.$message({
                             type: 'success',
                             message: '操作成功'
@@ -232,15 +254,14 @@
                 })
             },
             addSubmitList(){
-                console.log(this.otherTransferDataRight[0])
                 this.tableData = transferUtil(this.transferDataLift,this.otherTransferDataRight);
                 localStorage.setItem("tempTableData",JSON.stringify(this.tableData));
                 localStorage.setItem("otherTransferDataRight",JSON.stringify(this.otherTransferDataRight));
-                console.log(localStorage.getItem("tempTableData"))
 
             },
-            saveListChage(){
+            saveListChage(row){
                 localStorage.setItem("tempTableData",JSON.stringify(this.tableData));
+                row.money = row.number * row.price;
             },
             handleSizeChange(val) {
                 this.currentSize = val
@@ -250,7 +271,6 @@
             },
             //确定添加商品
             addOrEditProduct() {
-                console.log(this.form)
                 this.$axios({
                     method: 'post',
                     url: '/api/back/product/addoreditproduct',
@@ -298,14 +318,9 @@
                         this.loading = false;
                     })
             },
-            //清除缓存
-            clearLocalStorage(){
-                localStorage.removeItem("tempTableData");
-                localStorage.removeItem("otherTransferDataRight");
-            }
         },
         created() {
-            if(localStorage.getItem("otherTransferDataRight") != null){
+            if(localStorage.getItem("otherTransferDataRight") != null ){
                 this.otherTransferDataRight = JSON.parse(localStorage.getItem("otherTransferDataRight"));
             }
 
@@ -314,6 +329,9 @@
                 this.tableData = JSON.parse(localStorage.getItem("tempTableData"));
             }
             this.getCategories();
+        },
+        watch:{
+
         }
     }
 </script>
