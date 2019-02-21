@@ -1,43 +1,39 @@
 <template>
     <div style="width:100%; padding:30px 0px;margin-top: 10px;">
-        <el-row type="flex" class="row-bg" justify="space-around" style="font-size: 20px;">
-            <el-col :span="6"><div class="grid-content bg-purple">
-                <el-row>
-                    <el-card shadow="always" style="text-align: center; color:#009999">
-                        <span>注册人数</span><br>
-                        <countTo :startVal='personStart' :endVal='personEnd' :duration='3000' class="count"></countTo>
-                    </el-card>
-                </el-row>
+            <el-row type="flex" class="row-bg" justify="space-around" style="font-size: 20px;">
+                    <el-col :span="6">
+                        <div class="grid-content bg-purple-light">
+                            <el-card shadow="always" style="color:#33CCCC; text-align: center; ">
+                                <span>用户人数</span><br>
+                                <countTo :startVal='userStart' :endVal='count.user' :duration='3000' class="count"></countTo>
+                            </el-card>
+                        </div>
+                    </el-col>
+                    <el-col :span="6"><div class="grid-content bg-purple-light">
+                        <el-card shadow="always" style="color:#CC9933; text-align: center; ">
+                            <span>商品种类</span><br>
+                            <countTo :startVal='productStart' :endVal='count.product' :duration='3000' class="count"></countTo>
+                        </el-card>
+                    </div>
 
-            </div>
-            </el-col>
-            <el-col :span="6"><div class="grid-content bg-purple-light">
-                <el-card shadow="always" style="color:#CC9933; text-align: center; ">
-                    <span>商品种类</span><br>
-                    <countTo :startVal='productStart' :endVal='productEnd' :duration='3000' class="count"></countTo>
-                </el-card>
-            </div></el-col>
-            <el-col :span="6"><div class="grid-content bg-purple">
-                <el-card shadow="always" style="color:#9999FF; text-align: center; ">
-                    <span>员工人数</span><br>
-                    <countTo :startVal='employeeStart' :endVal='employeeEnd' :duration='3000' class="count"></countTo>
-                </el-card>
-            </div></el-col>
-        </el-row>
+                    </el-col>
+                    <el-col :span="6"><div class="grid-content bg-purple">
+                        <el-card shadow="always" style="color:#9999FF; text-align: center; ">
+                            <span>员工人数</span><br>
+                            <countTo :startVal='employeeStart' :endVal='count.employee' :duration='3000' class="count"></countTo>
+                        </el-card>
+                    </div>
+                    </el-col>
+            </el-row>
 
-        <el-row style="margin-top:60px; margin-bottom: 20px;">
-            <el-col :span="12" style="font-weight: bold; text-align: center;color: teal;">注册人数走势</el-col>
-            <el-col :span="12" style="font-weight: bold; text-align: center;color: teal;">商品销售走势</el-col>
-        </el-row>
-        <el-row :gutter="12">
-            <el-col :span="12">
-                <el-card shadow="always" style="text-align: center; color:#009999">
-                <ve-line :data="chartData" :settings="chartSettings"></ve-line>
-                </el-card>
-            </el-col>
-            <el-col :span="12" >
-                <el-card shadow="always" style="text-align: center; color:#009999">
-                <ve-pie :data="chartData"></ve-pie>
+        <el-row style="margin-top: 100px;">
+            <el-col :span="24">
+                <el-card class="box-card" style="font-size: 20px;text-align: center;">
+                    近些天订单走势
+                    <div style="margin-top: 20px">
+                        <ve-line :data="chartData" :settings="chartSettings"></ve-line>
+                    </div>
+
                 </el-card>
             </el-col>
         </el-row>
@@ -53,35 +49,48 @@
         name:'first',
         data () {
             this.chartSettings = {
-                metrics: ['访问用户', '下单用户'],
-                dimension: ['日期']
+                area: true
             }
             return {
-                personStart:0,
-                personEnd:345,
-                productStart:600,
-                productEnd:1200,
+                userStart:0,
+                productStart:0,
                 employeeStart:0,
-                employeeEnd:756,
+                count:{
+                    product:0,
+                    user:0,
+                    employee:0,
+                },
                 chartData: {
-                    columns: ['日期', '访问用户', '下单用户'],
+                    columns: ['日期', '进货订单', '出货订单'],
                     rows: [
-                        { '日期': '1/1', '访问用户': 1393, '下单用户': 1093, '下单率': 0.32 },
-                        { '日期': '1/2', '访问用户': 3530, '下单用户': 3230, '下单率': 0.26 },
-                        { '日期': '1/3', '访问用户': 2923, '下单用户': 2623, '下单率': 0.76 },
-                        { '日期': '1/4', '访问用户': 1723, '下单用户': 1423, '下单率': 0.49 },
-                        { '日期': '1/5', '访问用户': 3792, '下单用户': 3492, '下单率': 0.323 },
-                        { '日期': '1/6', '访问用户': 4593, '下单用户': 4293, '下单率': 0.78 }
                     ]
                 }
             }
+        },
+        created() {
+            this.$axios.get("/api/back/charts/count")
+                .then(response=>{
+                    if(response.data.success){
+                        this.count.product = response.data.product
+                        this.count.user = response.data.user
+                        this.count.employee = response.data.employee
+                    }
+                })
+
+            this.$axios.get("/api/back/charts/orderperday")
+                .then(response=>{
+                    this.chartData.rows = response.data.dayCount
+                })
         }
     }
 </script>
 
-<style scoped>
+<style>
     .count{
         font-weight: bold;
         font-size: 19px;
+    }
+    .count .el-card__body{
+        padding: 0 !important;
     }
 </style>

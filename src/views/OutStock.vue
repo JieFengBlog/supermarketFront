@@ -280,7 +280,13 @@
             },
             //从服务器上获取所有的商品信息
             getAllProductFromServer(){
-                this.$axios. get("/api/back/product/getallproduct")
+                this.$axios({
+                    url:"/api/back/product/getallproduct",
+                    method:'post',
+                    data:{
+                        status:1
+                    }
+                })
                     .then(response=>{
                         this.loading = true;
                         this.transferDataLift = response.data.products;

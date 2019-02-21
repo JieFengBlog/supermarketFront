@@ -6,10 +6,10 @@
                 <el-button type="primary" @click="addUserBtn">添加用户</el-button>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary">查询</el-button>
+                <el-button type="primary" @click="searchUser">查询</el-button>
             </el-form-item>
             <el-form-item>
-                <el-input placeholder="输入查询关键字" ></el-input>
+                <el-input placeholder="输入查询关键字" v-model="searchCondition"></el-input>
             </el-form-item>
         </el-form>
     </el-col>
@@ -127,6 +127,7 @@
                 dialogTitle:'',
                 currentPage:1,
                 currentSize:8,
+                searchCondition:'',
                 tableData: [],
                 multipleSelection: [],
                 loading:false,
@@ -148,6 +149,24 @@
             }
         },
         methods:{
+            searchUser(){
+                this.$axios({
+                    method:'post',
+                    url:'/api/back/user/selectcondition',
+                    data:{
+                        searchCondition:this.searchCondition
+                    }
+                }).then((response)=>{
+                    if(response.data.success){
+                        this.tableData = response.data.searchUserList
+                    }else{
+                        this.$message({
+                            type: 'error',
+                            message: '查询失败!'
+                        });
+                    }
+                })
+            },
             deleteUser(id){
                 this.$confirm('此操作将永久删除此用户, 是否继续?', '提示', {
                     confirmButtonText: '确定',
@@ -241,6 +260,13 @@
         },
         created() {
             this.getAllUser()
+        },
+        watch:{
+            searchCondition(){
+                if(this.searchCondition == null || this.searchCondition == ''){
+                    this.getAllUser();
+                }
+            }
         }
     }
 </script>

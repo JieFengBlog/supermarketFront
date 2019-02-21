@@ -11,7 +11,7 @@
                         </div>
                         <!--穿梭框-->
                         <el-transfer v-model="otherTransferDataRight"
-                                     :data="transferDataLift"
+                                     :data="transferDataLeft"
                                      :props="{
                                           key: 'id',
                                           label: 'name'
@@ -25,49 +25,8 @@
                             <el-button size="medium" style="margin-left: 70%;" @click="addSubmitList">加入待提交订单</el-button>
                         </div>
                     </el-card>
-
-                <!--添加新的商品库存-->
-                <el-card class="box-card" style="margin-top: 20px;">
-                    <div slot="header" class="clearfix">
-                        <span style="font-size: 20px;">添加新的商品库存</span>
-                        <i class="el-icon-plus" style="float: right; padding: 3px 0"></i>
-                    </div>
-
-                    <el-form :model="form">
-                        <el-form-item label="商品名称" :label-width="formLabelWidth" prop="name">
-                            <el-input v-model="form.name" autocomplete="off"></el-input>
-                        </el-form-item>
-                        <el-form-item label="描述" :label-width="formLabelWidth">
-                            <el-input v-model="form.productDesc" autocomplete="off"  type="textarea" :row="2"></el-input>
-                        </el-form-item>
-                        <el-form-item label="单价" :label-width="formLabelWidth" prop="price">
-                            <el-input-number v-model="form.price" :min="1" :max="9999" label="描述文字"></el-input-number>
-                        </el-form-item>
-                        <el-form-item label="单位" :label-width="formLabelWidth" prop="unit">
-                            <el-input v-model="form.unit" autocomplete="off"></el-input>
-                        </el-form-item>
-                        <el-form-item label="分类" :label-width="formLabelWidth">
-                            <el-select v-model="form.category" placeholder="请选择分类">
-                                <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id"></el-option>
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item label="进货数量" :label-width="formLabelWidth" prop="stock">
-                            <el-input-number v-model="form.stock" :min="1" :max="9999" label="描述文字"></el-input-number>
-                        </el-form-item>
-                        <el-form-item label="供应商" :label-width="formLabelWidth">
-                            <el-input v-model="form.provide" autocomplete="off"></el-input>
-                        </el-form-item>
-                        <el-form-item style="width:100%; padding-left: 40%;">
-                            <el-button type="primary" @click="addOrEditProduct" plain >添加新的商品</el-button>
-                        </el-form-item>
-                    </el-form>
-                </el-card>
-
             </div>
             </el-col>
-
-
-
 
 
             <el-col :span="14">
@@ -178,7 +137,7 @@
             return{
                 supply:'',//供货者
                 otherTransferDataRight:[],//穿梭框右边
-                transferDataLift: [],
+                transferDataLeft: [],
                 tableData:[],//表格数据
                 formLabelWidth:"120px",
                 loading:false,
@@ -254,7 +213,7 @@
                 })
             },
             addSubmitList(){
-                this.tableData = transferUtil(this.transferDataLift,this.otherTransferDataRight);
+                this.tableData = transferUtil(this.transferDataLeft,this.otherTransferDataRight);
                 localStorage.setItem("tempTableData",JSON.stringify(this.tableData));
                 localStorage.setItem("otherTransferDataRight",JSON.stringify(this.otherTransferDataRight));
 
@@ -269,52 +228,18 @@
             handleCurrentChange(val) {
                 this.currentPage = val;
             },
-            //确定添加商品
-            addOrEditProduct() {
-                this.$axios({
-                    method: 'post',
-                    url: '/api/back/product/addoreditproduct',
-                    data: {
-                        product: this.form,
-                        addOrEdit: true
-                    }
-                }).then((response) => {
-                    if (response.data.success) {
-                        this.getAllProductFromServer();
-                        this.$message({
-                            type: 'success',
-                            message: '操作成功'
-                        });
-                    } else {
-                        this.$message({
-                            type: 'error',
-                            message: '操作失败'
-                        });
-                    }
-                })
-            },
-            //获取分类列表
-            getCategories(){
-                this.$axios({
-                    method: 'get',
-                    url: '/api/back/category/getallcategory'
-                }).then((response) => {
-                    if (response.data.success) {
-                        this.categoryList = response.data.categoryList;
-                    } else {
-                        this.$message({
-                            type: 'success',
-                            message: response.data.errMsg
-                        });
-                    }
-                })
-            },
             //从服务器上获取所有的商品信息
             getAllProductFromServer(){
-                this.$axios. get("/api/back/product/getallproduct")
+                this.$axios({
+                    url:"/api/back/product/getallproduct",
+                    method:'post',
+                    data:{
+                        status:0
+                    }
+                })
                     .then(response=>{
                         this.loading = true;
-                        this.transferDataLift = response.data.products;
+                        this.transferDataLeft = response.data.products;
                         this.loading = false;
                     })
             },

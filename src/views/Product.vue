@@ -38,6 +38,7 @@
                     <el-select v-model="form.category" placeholder="请选择分类">
                         <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id"></el-option>
                     </el-select>
+                    <el-button type="text" style="margin-left: 5px; color:#909399" @click="addCategoryBtn">添加分类</el-button>
                 </el-form-item>
                 <el-form-item label="库存" :label-width="formLabelWidth" prop="stock">
                     <el-input v-model="form.stock" autocomplete="off" type="number"></el-input>
@@ -209,6 +210,10 @@
                 tableData: [],
                 mulId:[],
                 mul: [],
+                category:{
+                  id:null,
+                  name:''
+                },
                 dialogFormVisible: false,
                 formLabelWidth: '120px',
                 loading:true,
@@ -389,18 +394,58 @@
                 });
             },
 
-
             //从服务器上获取所有的商品信息
             getAllProductFromServer(){
-                this.loading = true;
-                this.$axios. get("/api/back/product/getallproduct")
+                this.$axios({
+                    url:"/api/back/product/getallproduct",
+                    method:'post',
+                    data:{
+                        status:0
+                    }
+                })
                     .then(response=>{
+                        this.loading = true;
                         this.tableData = response.data.products;
                         this.loading = false;
                     })
-
             },
 
+            addCategory(name){
+                this.category.name = name;
+                this.$axios({
+                    method: 'post',
+                    url: '/api/back/category/addcategory',
+                    data: {
+                        category:this.category
+                    }
+                }).then((response) => {
+                    if(response.data.success){
+                        this.getCategories();
+                        this.$message({
+                            type: 'success',
+                            message: '操作成功'
+                        });
+                    }else{
+                        this.$message({
+                            type: 'error',
+                            message: '操作失败'
+                        });
+                    }
+                })
+            },
+            addCategoryBtn(){
+                this.$prompt('请输入分类名', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                }).then(({ value }) => {
+                    this.addCategory(value);
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '取消输入'
+                    });
+                });
+            },
             //模糊查询
             searchProduct(){
                 console.log(this.searchCondition)

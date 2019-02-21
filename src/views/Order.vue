@@ -107,18 +107,11 @@
             </el-col>
 
 
-            <!--当点击添加商品的按钮时弹出的diglog-->
+            <!--Dialog-->
             <el-dialog title="更新订单" :visible.sync="dialogFormVisible">
                 <el-form :model="formUpdate">
                     <el-form-item label="订单金额(￥)" :label-width="formLabelWidth" prop="orderPrice">
                         <el-input v-model="formUpdate.orderPrice" autocomplete="off"></el-input>
-                    </el-form-item>
-                    <el-form-item label="创建时间" :label-width="formLabelWidth"><br>
-                        <el-date-picker
-                                v-model="formUpdate.createTime"
-                                type="datetime"
-                                placeholder="选择日期时间">
-                        </el-date-picker>
                     </el-form-item>
                     <el-form-item label="消费者" :label-width="formLabelWidth" prop="user" v-if="consumerVisible">
                         <el-select v-model="userId" placeholder="请选择消费者">
@@ -223,7 +216,7 @@
                 formLabelWidth:'120px',
                 orderDetailTable:[],
                 currentPage:1,
-                currentSize:8,
+                currentSize:5,
                 provideVisible:false,
                 userVisible:false,
                 orderTypeTag:'',
@@ -233,14 +226,14 @@
                     orderPrice:0,
                     orderProvide:'',
                     user:null,
-                    createTime:'',
+                    createTime:null,
                 },
                 formUpdate:{
                     id:null,
                     orderNumber:'',
                     orderPrice:0,
                     orderProvide:'',
-                    createTime:'',
+                    createTime:null,
                     orderStatus:null,
                 },
                 statusUpdate:{
@@ -298,6 +291,7 @@
 
             },
             updateOrder(){
+                console.log(this.formUpdate)
                 this.dialogFormVisible = false;
                 //去请求具体商品列表
                 this.$axios({
@@ -360,7 +354,7 @@
                 this.$refs.filterTable.clearFilter();
             },
             filterTag(value, row) {
-                return row.tag === value;
+                return row.orderType === value;
             },
             handleSizeChange(val) {
                 this.currentSize = val
