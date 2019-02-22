@@ -19,7 +19,7 @@
             </el-form>
         </el-col>
 
-        <!--当点击添加商品的按钮时弹出的diglog-->
+        <!--diglog-->
         <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible">
             <el-form :model="form" :rules="productRules">
                 <el-form-item label="商品名称" :label-width="formLabelWidth" prop="name">
@@ -35,7 +35,7 @@
                     <el-input v-model="form.unit" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="分类" :label-width="formLabelWidth">
-                    <el-select v-model="form.category" placeholder="请选择分类">
+                    <el-select v-model="form.category.id" placeholder="请选择分类">
                         <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id"></el-option>
                     </el-select>
                     <el-button type="text" style="margin-left: 5px; color:#909399" @click="addCategoryBtn">添加分类</el-button>
@@ -226,7 +226,10 @@
                     productDesc:'',
                     unit:'',
                     price: null,
-                    category: '',
+                    category:{
+                      id:null,
+                      name:''
+                    },
                     stock: null,
                     provide: '',
                     status: '',
@@ -285,7 +288,7 @@
                 this.form.name = '';
                 this.form.productDesc = '';
                 this.form.price = null;
-                this.form.category = '';
+                this.form.category.id = '';
                 this.form.stock = null;
                 this.form.status = '';
                 this.form.provide = '';
@@ -337,7 +340,8 @@
                 this.form.name = data.name;
                 this.form.productDesc = data.productDesc;
                 this.form.price = data.price;
-                this.form.category = data.category.id;
+                this.form.unit = data.unit;
+                this.form.category.id = data.category.id;
                 this.form.stock = data.stock;
                 this.form.status = data.status;
                 this.form.provide = data.provide;
@@ -367,7 +371,7 @@
 
             //删除单个商品时执行的
             deleteProductItem(index,row){
-                this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+                this.$confirm('此操作将永久删除该商品信息, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'

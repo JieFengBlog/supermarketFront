@@ -2,7 +2,7 @@ module.exports ={
     devServer:{
         open:true,
         host:"localhost",
-        port: 8081,
+        port: 80,
         hotOnly: false,//热更新
         proxy:{
             //配置跨域
