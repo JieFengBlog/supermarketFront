@@ -5,7 +5,7 @@
       <el-row style="padding-top:12px; float:right; padding-right: 30px;">
         <el-col :span="24" >
             <el-dropdown @command="handleCommand">
-                  <img src="./assets/touxiang.jpg" style="width: 45px; height: 45px;border-radius: 50%;"/>
+                  <img src="./assets/touxiang.jpg" style="width: 45px; height: 45px;border-radius: 50%; cursor: pointer;"/>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item command="logout">退出登录</el-dropdown-item>
                 <el-dropdown-item command="clear">清空缓存</el-dropdown-item>
@@ -28,12 +28,8 @@
                  unique-opened
                  active-text-color="#19be6b"
         >
-          <el-menu-item index="/home" >
-            <i class="iconfont sa--shouye ali"></i>
-            <span slot="title">首页</span>
-          </el-menu-item>
 
-            <el-menu-item index="/home/in">
+            <el-menu-item index="/home">
               <i class="el-icon-d-arrow-right"></i>
               <span slot="title">入库</span>
             </el-menu-item>
@@ -98,7 +94,7 @@
 </template>
 
 <script>
-  import User from './views/User'
+  import  User from './views/User'
   import {conversion} from './commons/BooleanUtil'
   import {clear} from "./commons/cache";
 

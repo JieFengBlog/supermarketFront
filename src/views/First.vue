@@ -26,17 +26,7 @@
                     </el-col>
             </el-row>
 
-        <el-row style="margin-top: 100px;">
-            <el-col :span="24">
-                <el-card class="box-card" style="font-size: 20px;text-align: center;">
-                    近些天订单走势
-                    <div style="margin-top: 20px">
-                        <ve-line :data="chartData" :settings="chartSettings"></ve-line>
-                    </div>
 
-                </el-card>
-            </el-col>
-        </el-row>
     </div>
 </template>
 
@@ -75,11 +65,6 @@
                         this.count.user = response.data.user
                         this.count.employee = response.data.employee
                     }
-                })
-
-            this.$axios.get("/api/back/charts/orderperday")
-                .then(response=>{
-                    this.chartData.rows = response.data.dayCount
                 })
         }
     }

@@ -36,8 +36,7 @@ export default new Router({
       component: Home,
       name:'首页',
       children:[
-        {path:'/',component:First},
-        {path:'/home/in',name:'入库',component:Stock},
+        {path:'/',name:'入库',component:Stock},
         {path:'/home/out',name:'出库',component:OutStock},
         {path:'/home/order',name:'订单查询',component:Order},
         {path:'/home/user',name:'用户管理',component:User},

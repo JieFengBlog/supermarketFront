@@ -209,6 +209,7 @@
                 }).then((response) => {
                     if(response.data.success){
                         clear();
+                        this.consumer = '';
                         this.tableData = [];
                         this.$message({
                             type: 'success',

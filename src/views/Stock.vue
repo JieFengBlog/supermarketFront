@@ -200,6 +200,7 @@
                     if(response.data.success){
                         clear();
                         this.tableData = [];
+                        this.supply = '';
                         this.$message({
                             type: 'success',
                             message: '操作成功'
