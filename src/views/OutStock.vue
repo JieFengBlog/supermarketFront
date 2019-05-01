@@ -12,6 +12,7 @@
                         <!--穿梭框-->
                         <el-transfer v-model="otherTransferDataRight"
                                      :data="transferDataLift"
+                                     :titles="['待选商品列表', '已选商品列表']"
                                      :props="{
                                           key: 'id',
                                           label: 'name'

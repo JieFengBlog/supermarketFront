@@ -147,7 +147,7 @@
                     id:null,
                     name: '',
                     productDesc:'',
-                    price: 0,
+                    price: 0.0,
                     unit:'',
                     category: '',
                     stock: 1,

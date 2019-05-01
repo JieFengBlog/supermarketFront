@@ -225,7 +225,7 @@
                     name: '',
                     productDesc:'',
                     unit:'',
-                    price: null,
+                    price: 0.0,
                     category:{
                       id:null,
                       name:''

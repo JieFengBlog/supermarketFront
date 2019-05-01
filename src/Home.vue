@@ -1,5 +1,25 @@
 <template>
   <el-container class="container">
+      <el-dialog
+              title="修改密码"
+              :visible.sync="changePasswordVisible"
+              width="30%"
+      >
+          <el-form  label-width="80px">
+              <el-form-item label="旧密码">
+                  <el-input v-model="oldPassword"></el-input>
+              </el-form-item>
+              <el-form-item label="新密码">
+                  <el-input v-model="newPassword"></el-input>
+              </el-form-item>
+          </el-form>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="changePasswordVisible = false">取 消</el-button>
+            <el-button type="primary" @click="changePassword">确 定</el-button>
+          </span>
+      </el-dialog>
+
+
     <el-header class="header" height="70px">
       <img src="./assets/logo.png" style="width: 200px; height: 70px;"/>
       <el-row style="padding-top:12px; float:right; padding-right: 30px;">
@@ -7,8 +27,10 @@
             <el-dropdown @command="handleCommand">
                   <img src="./assets/touxiang.jpg" style="width: 45px; height: 45px;border-radius: 50%; cursor: pointer;"/>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item command="logout">退出登录</el-dropdown-item>
-                <el-dropdown-item command="clear">清空缓存</el-dropdown-item>
+                  <el-dropdown-item command="clear">清空缓存</el-dropdown-item>
+                  <el-dropdown-item command="changePassword">修改密码</el-dropdown-item>
+                  <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+
               </el-dropdown-menu>
             </el-dropdown>
         </el-col>
@@ -103,7 +125,10 @@
       return {
         activeIndex: 'first',
         levelList:[],
-        count:0
+        changePasswordVisible:false,
+        count:0,
+          newPassword:null,
+          oldPassword:null,
       };
     },
     components:{
@@ -153,7 +178,30 @@
                   break;
             case "clear": this.clearLocalStorage();
                   break;
+            case "changePassword": this.changePasswordBtn();
+
           }
+      },
+      changePasswordBtn() {
+          this.changePasswordVisible = true
+      },
+      changePassword(){
+          this.$axios({
+              method: 'post',
+              url:'/api/back/login/changePassword',
+              data:{
+                  oldPassword: this.oldPassword,
+                  newPassword: this.newPassword
+              }
+          }).then(response=>{
+              if(response.data){
+                  this.changePasswordVisible = false;
+                  this.$message.success("修改成功");
+              }else{
+                  this.changePasswordVisible = false;
+                  this.$message.error("旧密码错误");
+              }
+          })
       }
     },
     created() {
