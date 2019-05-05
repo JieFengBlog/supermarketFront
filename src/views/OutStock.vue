@@ -6,7 +6,7 @@
                     <!--选择已有的商品进货-->
                     <el-card class="box-card" >
                         <div slot="header" class="clearfix">
-                            <span style="font-size: 20px;">选择已有的商品添加库存</span>
+                            <span style="font-size: 20px;">选择已有的商品添加到出库</span>
                             <i class="el-icon-plus" style="float: right; padding: 3px 0"></i>
                         </div>
                         <!--穿梭框-->
